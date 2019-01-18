@@ -101,7 +101,9 @@ public class Driver {
                     Queue<Integer> groups = new ConcurrentLinkedQueue<>(verticesMapLabelCurrent.keySet());
                     final int[] threadsRunning = {0};
                     for (final int[] threadCount = {0}; threadCount[0] < maxThreads; threadCount[0]++) {
-                        threadsRunning[0]++;
+                        synchronized (monitor) {
+                            threadsRunning[0]++;
+                        }
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
