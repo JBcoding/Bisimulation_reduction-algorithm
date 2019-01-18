@@ -8,6 +8,14 @@ public class Driver {
     private static final Object monitor = new Object();
 
     public static void main(String[] args) throws SQLException {
+        if (args.length < 2) {
+            return;
+        }
+
+        int blockCount = Integer.parseInt(args[0]);
+        int maxThreads = Integer.parseInt(args[1]);
+
+
         Connection conn = null;
         Properties connectionProps = new Properties();
         connectionProps.put("user", "root");
@@ -28,7 +36,8 @@ public class Driver {
             List<Edge> edges = new ArrayList<>();
 
             Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM Vertices WHERE block_height >= 474044 - 20;");
+            // I know prepared statements would be better, but this is only me using this on a tester server :)
+            ResultSet rs = st.executeQuery("SELECT * FROM Vertices WHERE block_height >= 474044 - " + blockCount + ";");
 
             int maxId = 0;
 
@@ -91,7 +100,7 @@ public class Driver {
                     labelsSizeLastTimeItWasUsed.put(superGroup, verticesMapLabelLastFullStep.get(superGroup).size());
                     Queue<Integer> groups = new ConcurrentLinkedQueue<>(verticesMapLabelCurrent.keySet());
                     final int[] threadsRunning = {0};
-                    for (final int[] threadCount = {0}; threadCount[0] < 4; threadCount[0]++) {
+                    for (final int[] threadCount = {0}; threadCount[0] < maxThreads; threadCount[0]++) {
                         threadsRunning[0]++;
                         new Thread(new Runnable() {
                             @Override
